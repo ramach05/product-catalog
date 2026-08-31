@@ -6,19 +6,19 @@
 
 ### Страница входа
 
-<img src="screenshots/login.png" alt="Страница входа: форма с полями логин и пароль, чекбокс «Запомнить данные», кнопка «Войти»" width="300" />
+<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/login.png" alt="Страница входа: форма с полями логин и пароль, чекбокс «Запомнить данные», кнопка «Войти»" width="300" />
 
 ### Валидация формы входа
 
-<img src="screenshots/login-validation.png" alt="Форма входа с отображением ошибок валидации под полями" width="300" />
+<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/login-validation.png" alt="Форма входа с отображением ошибок валидации под полями" width="300" />
 
 ### Каталог товаров
 
-<img src="screenshots/main-page.png" alt="Страница каталога: шапка с поиском и кнопкой «Выйти», таблица товаров с колонками наименование, вендор, артикул, оценка, цена, действия, пагинация" width="300" />
+<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/main-page.png" alt="Страница каталога: шапка с поиском и кнопкой «Выйти», таблица товаров с колонками наименование, вендор, артикул, оценка, цена, действия, пагинация" width="300" />
 
 ### Добавление товара
 
-<img src="screenshots/modal.png" alt="Модальное окно «Добавить товар» с полями: наименование, цена, вендор, артикул, кнопки «Отмена» и «Добавить»" width="300" />
+<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/modal.png" alt="Модальное окно «Добавить товар» с полями: наименование, цена, вендор, артикул, кнопки «Отмена» и «Добавить»" width="300" />
 
 ## Стек
 
