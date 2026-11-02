@@ -1,157 +1,108 @@
-# Каталог товаров интернет-магазина
+# Product Catalog
 
-Вход в аккаунт, список товаров в виде таблицы с поиском и сортировкой, добавление позиций в каталог, пагинация.
+🇬🇧 **English** | [🇷🇺 Русский](README.ru.md)
 
-## Скриншоты
+[![CI](https://github.com/ramach05/product-catalog/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ramach05/product-catalog/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-### Страница входа
+An authenticated product catalog: login against a real API, a searchable and
+sortable products table with pagination, selection across pages and an
+add-product modal. React 18, TypeScript, Vite, Zustand, CSS Modules.
 
-<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/login.png" alt="Страница входа: форма с полями логин и пароль, чекбокс «Запомнить данные», кнопка «Войти»" width="300" />
+## Screens
 
-### Валидация формы входа
+| Login | Validation | Catalog | Add product |
+| --- | --- | --- | --- |
+| <img src="screenshots/login.png" alt="Login form" width="220" /> | <img src="screenshots/login-validation.png" alt="Login form with validation errors" width="220" /> | <img src="screenshots/main-page.png" alt="Products table with search and pagination" width="220" /> | <img src="screenshots/modal.png" alt="Add product modal" width="220" /> |
 
-<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/login-validation.png" alt="Форма входа с отображением ошибок валидации под полями" width="300" />
+## Highlights
 
-### Каталог товаров
+- **Session strategy follows user intent** — "remember me" stores the token in
+  `localStorage` (survives browser restart), otherwise `sessionStorage` (dies
+  with the tab); the token is re-validated via `GET /auth/me` on app start and
+  a stale token forces logout.
+- **Server-side search, sort and pagination** — debounced search, `limit`/`skip`
+  pagination, column sorting (`sortBy`, `order`) all go through the API; page
+  number and search query persist in `sessionStorage` (Zustand `persist`) and
+  are restored on return.
+- **Selection across pages** — row checkboxes plus a header "select all" that
+  applies to the current page only while selections on other pages are kept.
+- **Loading states everywhere** — progress bar on every fetch, a 5-row skeleton
+  table before the first successful load, dismissible error message.
+- **Add-product modal** — field validation, closes on backdrop click, "×" or
+  `Escape`; new items go to local state with a success toast (no API write).
 
-<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/main-page.png" alt="Страница каталога: шапка с поиском и кнопкой «Выйти», таблица товаров с колонками наименование, вендор, артикул, оценка, цена, действия, пагинация" width="300" />
+## Features
 
-### Добавление товара
+- Login form: required-field validation, per-field errors plus a form-level
+  block (also for API errors). Demo credentials: login `emilys`, password
+  `emilyspass`.
+- Table columns: name (thumbnail + category), vendor, SKU, rating, price,
+  actions; ratings below 3 are highlighted in red.
+- Sort by name, vendor, rating, price — click a header to cycle asc → desc;
+  sort state lives in the store for the session.
+- "Refresh" resets search and page and reloads; "Logout" clears the token and
+  persisted page/search and redirects to login.
+- Protected route: unauthenticated visits to the catalog redirect to login.
 
-<img src="https://cdn.jsdelivr.net/gh/ramach05/Product-Catalog-react-zustand-vite-CSS-modules@main/screenshots/modal.png" alt="Модальное окно «Добавить товар» с полями: наименование, цена, вендор, артикул, кнопки «Отмена» и «Добавить»" width="300" />
+## API
 
-## Стек
+- **Products**: [DummyJSON Products](https://dummyjson.com/docs/products) —
+  list, `/products/search`, sorting via `sortBy`/`order`, pagination via
+  `limit`/`skip`.
+- **Auth**: [DummyJSON Auth](https://dummyjson.com/docs/auth) — `POST
+  /auth/login`, token check via `GET /auth/me` with `Authorization: Bearer
+  <token>`.
 
-- **React 18**
-- **TypeScript**
-- **Vite**
-- **React Router**
-- **Zustand**
-- **CSS Modules**
+In dev, requests are proxied by Vite: [vite.config.ts](vite.config.ts) maps
+`/api/dummyjson` to `https://dummyjson.com`.
 
-## Требования
+## Structure
 
-- Node.js 20+
-- npm
+```
+├── src/
+│   ├── api/         # API_BASE, authApi (login/getMe), productsApi (fetch/search)
+│   ├── store/       # authStore (token, init, login, logout),
+│   │                # productsStore (list, pagination, search, sort, selection, persist)
+│   ├── pages/       # LoginPage, ProductsPage (+ CSS Modules)
+│   ├── components/  # ProtectedRoute, Button, Input, Checkbox, ProductsTable,
+│   │                # AddProductModal, Toast, ProgressBar, icons/
+│   ├── hooks/       # useDebounce
+│   ├── types/       # auth, product, component props
+│   └── utils/       # storage (token local/session), validation, format, dom id
+└── vite.config.ts   # dev proxy to dummyjson.com
+```
 
-## Установка и запуск
+## Implementation notes
+
+- **Semantics and a11y**: `main`, `section`, `nav`, `header`, `footer`,
+  skip-link, `visually-hidden`, ARIA attributes.
+- **Styles**: CSS Modules with design tokens in `:root` ([index.css](src/index.css));
+  shared primitives (Button, Input, Checkbox) reused across pages.
+- **State**: Zustand only — no prop drilling for auth or table state; `persist`
+  middleware scoped to page/search only.
+- **Types**: strict TypeScript, shared types in [src/types/](src/types/).
+
+## Quick start
+
+Node.js 20+.
 
 ```bash
 npm install
-npm run dev
+npm run dev    # http://localhost:5173
 ```
 
-Откройте [http://localhost:5173](http://localhost:5173).
+| Script | Description |
+| --- | --- |
+| `npm run dev` | dev server with hot reload |
+| `npm run build` | typecheck + production build |
+| `npm run lint` | ESLint |
+| `npm run preview` | serve the production build |
 
-## Скрипты
+## Stack
 
-| Команда           | Описание                      |
-| ----------------- | ----------------------------- |
-| `npm run dev`     | Режим разработки с hot reload |
-| `npm run build`   | Production-сборка             |
-| `npm run lint`    | Проверка кода (ESLint)        |
-| `npm run preview` | Запуск собранного приложения  |
+**React 18** · **TypeScript** · **Vite** · **React Router** · **Zustand** · **CSS Modules**
 
-## Функциональность приложения
+## License
 
-### Вход
-
-- Форма с полями «Логин» и «Пароль», валидация обязательности заполнения. Ошибки отображаются под полями и общим блоком над формой (в т.ч. при ошибке API). Для авторизации нужно использовать тестовые логин "**emilys**" и пароль "**emilyspass**".
-- Чекбокс «Запомнить данные»: при отмеченном — токен сохраняется в localStorage (сессия переживает закрытие браузера), при снятом — в sessionStorage (сброс при закрытии вкладки).
-- После успешного входа — редирект на каталог товаров. При инициализации приложения токен проверяется через API (`/auth/me`); при невалидном токене выполняется выход.
-
-### Каталог товаров
-
-- Загрузка списка с внешнего API. При загрузке отображается прогресс-бар; до первой успешной загрузки — скелетон таблицы (5 строк). При ошибке загрузки показывается сообщение с возможностью закрыть.
-- Таблица: колонки «Наименование» (с превью и категорией), «Вендор», «Артикул», «Оценка», «Цена, Р», «Действия». Выбор строк чекбоксами; кнопка «Выбрать все» в шапке таблицы действует только для строк текущей страницы, выбор на других страницах сохраняется.
-
-### Сортировка
-
-- Сортировка по наименованию, вендору, оценке и цене по клику на заголовок колонки (цикл asc → desc). Состояние сортировки хранится в сторе на время сессии.
-
-### Поиск
-
-- Поиск по API с дебаунсом; пагинация (limit/skip). Номер страницы и строка поиска сохраняются в sessionStorage (Zustand persist) и восстанавливаются при возврате на страницу.
-
-### Добавление товара
-
-- Кнопка «Добавить» открывает модальное окно с полями: наименование, цена, вендор, артикул. Валидация полей; при успешном добавлении товар сохраняется в локальный стейт (без отправки на API), показывается Toast «Товар успешно добавлен», модалка закрывается. Закрытие по клику на фон, по кнопке «×» или по клавише Escape.
-
-### Интерфейс
-
-- Рейтинг товара ниже 3 подсвечивается красным.
-- Кнопки «Обновить» (сброс поиска и страницы, повторная загрузка) и «Выйти» (сброс токена и сохранённых page/search, редирект на страницу входа).
-
-## Данные / API
-
-- **Товары**: [DummyJSON Products](https://dummyjson.com/docs/products) — список, поиск (`/products/search`), сортировка (query-параметры `sortBy`, `order`). Пагинация через `limit` и `skip`.
-- **Авторизация**: [DummyJSON Auth](https://dummyjson.com/docs/auth) — вход через `POST /auth/login`; при старте приложения токен проверяется запросом `GET /auth/me` с заголовком `Authorization: Bearer <token>`.
-
-В режиме разработки запросы к API проксируются через Vite: в [vite.config.ts](vite.config.ts) настроен proxy с `/api/dummyjson` на `https://dummyjson.com`.
-
-## Структура проекта
-
-```
-├── index.html
-├── src/
-│   ├── main.tsx
-│   ├── App.tsx
-│   ├── index.css           # Глобальные переменные, сброс, skip-link, visually-hidden
-│   ├── api/
-│   │   ├── config.ts       # API_BASE (dev proxy / production)
-│   │   ├── authApi.ts      # login(), getMe()
-│   │   └── productsApi.ts  # fetchProducts(), searchProducts()
-│   ├── store/
-│   │   ├── authStore.ts    # token, init, login, logout (Zustand)
-│   │   └── productsStore.ts# Список, пагинация, поиск, сортировка, выбор, persist (page/search)
-│   ├── pages/
-│   │   ├── LoginPage.tsx
-│   │   ├── LoginPage.module.css
-│   │   ├── ProductsPage.tsx
-│   │   └── ProductsPage.module.css
-│   ├── components/
-│   │   ├── ProtectedRoute.tsx
-│   │   ├── ProtectedRoute.module.css
-│   │   ├── Button.tsx
-│   │   ├── Button.module.css
-│   │   ├── Input.tsx
-│   │   ├── Input.module.css
-│   │   ├── Checkbox.tsx
-│   │   ├── Checkbox.module.css
-│   │   ├── ProductsTable.tsx
-│   │   ├── ProductsTable.module.css
-│   │   ├── AddProductModal.tsx
-│   │   ├── AddProductModal.module.css
-│   │   ├── Toast.tsx
-│   │   ├── Toast.module.css
-│   │   ├── ProgressBar.tsx
-│   │   ├── ProgressBar.module.css
-│   │   └── icons/          # LoginIcons, TableIcons, index
-│   ├── hooks/
-│   │   └── useDebounce.ts
-│   ├── types/
-│   │   ├── auth.ts
-│   │   ├── product.ts
-│   │   ├── components.ts
-│   │   └── index.ts
-│   └── utils/
-│       ├── storage.ts      # Токен (local/session)
-│       ├── validation.ts   # Валидация формы добавления товара
-│       ├── format.ts       # formatPriceWithParts, formatRating
-│       └── dom.ts          # generateDomId
-├── screenshots/
-│   ├── login.png
-│   ├── login-validation.png
-│   ├── main-page.png
-│   └── modal.png
-├── vite.config.ts
-├── tsconfig.json
-└── package.json
-```
-
-## Особенности реализации
-
-- **Семантика и доступность**: разметка с `<main>`, `<section>`, `<nav>`, `<header>`, `<footer>` с использованием ARIA-атрибутов.
-- **Стили**: CSS Modules, дизайн-токены в `:root` ([index.css](src/index.css)); переиспользуемые компоненты (Button, Input, Checkbox) и страницы со своими модулями.
-- **Состояние**: Zustand; в authStore — токен, init (проверка токена через getMe), login, logout; в productsStore — список товаров, пагинация, поиск, сортировка, выбор строк, локально добавленные товары, persist (sessionStorage) только для номера страницы и строки поиска.
-- **Типизация**: строгий TypeScript; типы вынесены в [types/](src/types/) и используются в компонентах и страницах.
+MIT
